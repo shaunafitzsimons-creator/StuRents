@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ongoing Sanctions Monitoring — ABC Ltd</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f4f6f9;
+      color: #1a1a2e;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    nav {
+      width: 260px;
+      min-width: 260px;
+      background: #0d1b3e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      overflow-y: auto;
+    }
+
+    nav .logo {
+      padding: 0 24px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    nav .logo h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #4a9eff;
+      letter-spacing: 0.5px;
+    }
+
+    nav .logo p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 20px 0;
+      flex: 1;
+    }
+
+    nav ul li a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      font-size: 13px;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+    }
+
+    nav ul li a:hover,
+    nav ul li a.active {
+      color: #fff;
+      background: rgba(74,158,255,0.1);
+      border-left-color: #4a9eff;
+    }
+
+    nav ul li a .num {
+      font-size: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 2px 6px;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    nav .tag {
+      padding: 6px 24px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 8px;
+    }
+
+    /* Main content */
+    main {
+      margin-left: 260px;
+      flex: 1;
+      padding: 40px 48px;
+      max-width: 1100px;
+    }
+
+    /* Sections */
+    section {
+      display: none;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    /* Page header */
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-header .breadcrumb {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .page-header h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0d1b3e;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: #666;
+      margin-top: 6px;
+      max-width: 680px;
+    }
+
+    /* Stat cards */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #e8ecf0;
+    }
+
+    .stat-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0d1b3e;
+      line-height: 1;
+    }
+
+    .stat-card .sub {
+      font-size: 12px;
+      color: #888;
+      margin-top: 6px;
+    }
+
+    .stat-card.highlight .value { color: #4a9eff; }
+    .stat-card.warn .value { color: #e07b00; }
+    .stat-card.danger .value { color: #d63b3b; }
+
+    /* Content card */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e8ecf0;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0d1b3e;
+      margin-bottom: 14px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #444;
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    .card p:last-child { margin-bottom: 0; }
+
+    /* Two column */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* Tags */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+
+    .tag.green { background: #e6f7ee; color: #1a7a45; }
+    .tag.blue { background: #e8f2ff; color: #1a5cbf; }
+    .tag.orange { background: #fff3e0; color: #bf6000; }
+    .tag.red { background: #fdecea; color: #b71c1c; }
+    .tag.grey { background: #f0f0f0; color: #555; }
+
+    /* Flow diagram */
+    .flow {
+      background: #f8fafc;
+      border: 1px solid #e0e7ef;
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.9;
+      color: #333;
+      white-space: pre;
+      overflow-x: auto;
+      margin-bottom: 16px;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: #f4f6f9;
+      color: #555;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      border-bottom: 2px solid #e8ecf0;
+    }
+
+    table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #333;
+      vertical-align: top;
+    }
+
+    table tr:last-child td { border-bottom: none; }
+    table tr:hover td { background: #fafbfc; }
+
+    /* Release plan */
+    .release-block {
+      border-left: 4px solid #4a9eff;
+      padding-left: 20px;
+      margin-bottom: 28px;
+    }
+
+    .release-block.r2 { border-left-color: #7c4dff; }
+
+    .release-block h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0d1b3e;
+      margin-bottom: 4px;
+    }
+
+    .release-block .goal {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 14px;
+    }
+
+    /* Epic rows */
+    .epic {
+      background: #f8fafc;
+      border: 1px solid #e8ecf0;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .epic .epic-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0d1b3e;
+      margin-bottom: 4px;
+    }
+
+    .epic .epic-desc {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .epic .sprint-badge {
+      font-size: 11px;
+      background: #e8f2ff;
+      color: #1a5cbf;
+      padding: 3px 10px;
+      border-radius: 12px;
+      white-space: nowrap;
+      margin-left: 16px;
+      margin-top: 2px;
+    }
+
+    .epic .sprint-badge.r2 { background: #f0ebff; color: #5b21b6; }
+
+    /* Tension items */
+    .tension {
+      border-left: 3px solid #e07b00;
+      padding: 12px 16px;
+      background: #fff8f0;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 12px;
+    }
+
+    .tension h4 { font-size: 13px; font-weight: 600; color: #7a4000; margin-bottom: 4px; }
+    .tension p { font-size: 13px; color: #555; line-height: 1.6; }
+
+    /* Question items */
+    .question {
+      border-left: 3px solid #4a9eff;
+      padding: 10px 16px;
+      background: #f0f7ff;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    /* Metric rows */
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+    }
+
+    .metric-row:last-child { border-bottom: none; }
+    .metric-row .metric-name { color: #333; font-weight: 500; }
+    .metric-row .metric-target { color: #1a7a45; font-weight: 600; background: #e6f7ee; padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+    .metric-row .metric-target.warn { color: #bf6000; background: #fff3e0; }
+
+    /* Alert box */
+    .alert {
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .alert.blue { background: #e8f2ff; border-left: 4px solid #4a9eff; color: #1a3a6e; }
+    .alert.orange { background: #fff3e0; border-left: 4px solid #e07b00; color: #7a4000; }
+    .alert.green { background: #e6f7ee; border-left: 4px solid #1a7a45; color: #1a4a2e; }
+
+    /* Home grid */
+    .home-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .home-card {
+      background: #fff;
+      border: 1px solid #e8ecf0;
+      border-radius: 10px;
+      padding: 22px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      display: block;
+    }
+
+    .home-card:hover {
+      border-color: #4a9eff;
+      box-shadow: 0 4px 16px rgba(74,158,255,0.1);
+      transform: translateY(-1px);
+    }
+
+    .home-card .icon {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .home-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0d1b3e;
+      margin-bottom: 6px;
+    }
+
+    .home-card p {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav>
+  <div class="logo">
+    <h1>ABC Ltd — PM Task</h1>
+    <p>Ongoing Sanctions Monitoring</p>
+  </div>
+  <ul>
+    <li><a href="#" class="active" onclick="show('home', this)"><span class="num">⌂</span> Overview</a></li>
+
+    <div class="tag">The Work</div>
+
+    <li><a href="#" onclick="show('brief', this)"><span class="num">00</span> Problem Brief</a></li>
+    <li><a href="#" onclick="show('framing', this)"><span class="num">01</span> Problem Framing</a></li>
+    <li><a href="#" onclick="show('system', this)"><span class="num">02</span> Current System Map</a></li>
+    <li><a href="#" onclick="show('tensions', this)"><span class="num">03</span> Edge Cases & Tensions</a></li>
+    <li><a href="#" onclick="show('questions', this)"><span class="num">04</span> Assumptions & Questions</a></li>
+    <li><a href="#" onclick="show('numbers', this)"><span class="num">05</span> Numbers & Sizing</a></li>
+    <li><a href="#" onclick="show('flow', this)"><span class="num">06</span> Proposed Solution Flow</a></li>
+    <li><a href="#" onclick="show('releases', this)"><span class="num">07</span> Two-Release Plan</a></li>
+    <li><a href="#" onclick="show('team', this)"><span class="num">08</span> Ways of Working</a></li>
+    <li><a href="#" onclick="show('metrics', this)"><span class="num">09</span> Success Metrics</a></li>
+  </ul>
+</nav>
+
+<!-- Main -->
+<main>
+
+  <!-- HOME -->
+  <section id="home" class="active">
+    <div class="page-header">
+      <div class="breadcrumb">StuRents — Product Manager Interview Task</div>
+      <h2>Ongoing Sanctions Monitoring</h2>
+      <p>A product problem brief and solution plan for ABC Ltd — responding to proposed 2027 UK legislation requiring continuous sanctions monitoring of tenants during their tenancy.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card highlight">
+        <div class="label">Tenants in scope</div>
+        <div class="value">100k</div>
+        <div class="sub">Active rent payments via ABC</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="label">New annual cost</div>
+        <div class="value">£120k</div>
+        <div class="sub">Monthly checks at £0.10 each</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="label">Compliance deadline</div>
+        <div class="value">2027</div>
+        <div class="sub">~12–18 months from now</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Current check revenue</div>
+        <div class="value">£400k</div>
+        <div class="sub">200k tenants × £2.00</div>
+      </div>
+    </div>
+
+    <div class="alert blue">
+      <strong>The core tension:</strong> The legislation requires funds to freeze the moment a match is determined — but our human review process takes up to an hour with no SLA. The 8-hour window between 9am payment receipt and 5pm payout is the critical design constraint.
+    </div>
+
+    <div class="home-grid">
+      <a class="home-card" href="#" onclick="show('brief', document.querySelector('[onclick=\'show(\\\"brief\\\", this)\\\"\']'))">
+        <div class="icon">📋</div>
+        <h4>Problem Brief</h4>
+        <p>1-page alignment doc — what we're solving, why, and what we need to agree before design starts</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('framing', this)">
+        <div class="icon">🎯</div>
+        <h4>Problem Framing</h4>
+        <p>Regulatory trigger, product problem, who is affected, and what success looks like</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('system', this)">
+        <div class="icon">🗺️</div>
+        <h4>Current System Map</h4>
+        <p>How the existing sanctions check and rent payment flows work today</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('tensions', this)">
+        <div class="icon">⚠️</div>
+        <h4>Edge Cases & Tensions</h4>
+        <p>Timing gaps, data quality issues, and new obligations with no current equivalent</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('numbers', this)">
+        <div class="icon">🔢</div>
+        <h4>Numbers & Sizing</h4>
+        <p>Cost model, revenue implications, and operational load at different check frequencies</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('flow', this)">
+        <div class="icon">🔄</div>
+        <h4>Proposed Solution Flow</h4>
+        <p>End-to-end flow across three scenarios: no match, pending review, confirmed match</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('releases', this)">
+        <div class="icon">🚀</div>
+        <h4>Two-Release Plan</h4>
+        <p>What ships in R1 (compliance minimum) vs R2 (operationally good)</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('team', this)">
+        <div class="icon">👥</div>
+        <h4>Ways of Working</h4>
+        <p>How I'd move this from problem to shipped at a 45-person company</p>
+      </a>
+      <a class="home-card" href="#" onclick="show('metrics', this)">
+        <div class="icon">📊</div>
+        <h4>Success Metrics</h4>
+        <p>How we define and measure success — before and after launch</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- PROBLEM BRIEF -->
+  <section id="brief">
+    <div class="page-header">
+      <div class="breadcrumb">00 — Problem Brief</div>
+      <h2>Problem Brief: Ongoing Sanctions Monitoring</h2>
+      <p>Draft alignment doc — not a PRD. Enough to get engineering, legal, and operations in the same room with shared understanding.</p>
+    </div>
+
+    <div class="alert green"><strong>Purpose:</strong> This brief exists to align the team before design starts. No decisions need to be made from it — the goal is shared understanding.</div>
+
+    <div class="card">
+      <h3>What's happening and why we need to act</h3>
+      <p>The UK Government is introducing legislation in 2027 that extends the existing sanctions checking obligation on letting agents. Today, a sanctions check is required once — at the point a tenant signs their tenancy agreement. From 2027, that check must become continuous throughout the tenancy.</p>
+      <p>ABC Ltd currently performs the one-time check on behalf of letting agents automatically. When the new legislation comes into force, our letting agent customers will need to demonstrate ongoing monitoring is in place. If our software doesn't support it, they are non-compliant — and so are we.</p>
+      <p><strong>This is not optional and it is not a roadmap item. It is a legal deadline.</strong></p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>What the legislation requires</h3>
+        <p>If a tenant is matched against the UK sanctions list at any point during their tenancy:</p>
+        <div class="tag-row">
+          <span class="tag orange">Freeze rent payments immediately</span>
+          <span class="tag red">Notify NCA by email</span>
+        </div>
+        <p style="margin-top:12px">NCA notification must include: tenant full name, date of birth, current address.</p>
+      </div>
+      <div class="card">
+        <h3>What we need to build</h3>
+        <div class="tag-row" style="margin-bottom:12px">
+          <span class="tag blue">Scheduled monthly check</span>
+          <span class="tag blue">Real-time payment hold</span>
+          <span class="tag blue">NCA notification</span>
+          <span class="tag orange">Address data collection</span>
+        </div>
+        <p>Current address is not in our data model today. This gap must be closed before R1 ships.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>The core tension</h3>
+      <p>The legislation requires speed: freeze funds the moment a match is determined. But our current human review process takes up to an hour with no defined SLA. A flag at 4pm needs to be resolved before the 5pm payout. We need an SLA, an escalation path, or a default-hold rule before we ship.</p>
+    </div>
+
+    <div class="card">
+      <h3>What we need to align on before design starts</h3>
+      <table>
+        <thead><tr><th>Question</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td>Does "ongoing monitoring" specify a frequency?</td><td>Determines check cadence and cost model</td></tr>
+          <tr><td>NCA notification format and timeframe?</td><td>Shapes the integration spec</td></tr>
+          <tr><td>Current flag rate from existing checks?</td><td>Determines operational load on the reviewer</td></tr>
+          <tr><td>Can the sanctions API support scheduled batch calls?</td><td>Core technical feasibility question</td></tr>
+          <tr><td>How do we collect address for existing tenants?</td><td>Backfill strategy needed before go-live</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PROBLEM FRAMING -->
+  <section id="framing">
+    <div class="page-header">
+      <div class="breadcrumb">01 — Problem Framing</div>
+      <h2>Problem Framing</h2>
+      <p>What are we actually solving, and for whom?</p>
+    </div>
+
+    <div class="card">
+      <h3>The regulatory trigger</h3>
+      <p>UK Government proposed legislation (2027) extends the sanctions checking obligation from a one-time check at contract signing to <strong>continuous monitoring throughout the tenancy</strong>. The obligation sits with letting agents — ABC's software fulfils it on their behalf.</p>
+    </div>
+
+    <div class="card">
+      <h3>The product problem</h3>
+      <p>ABC's current system was designed for a single trigger: contract signing. It requires four new capabilities it does not have today:</p>
+      <div class="tag-row" style="margin-top:8px">
+        <span class="tag blue">Recurring check trigger</span>
+        <span class="tag blue">Payment hold at mid-tenancy event</span>
+        <span class="tag blue">External NCA integration</span>
+        <span class="tag blue">Time-sensitive human review SLA</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Who is affected</h3>
+      <table>
+        <thead><tr><th>Who</th><th>How</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Letting agents</strong></td><td>Compliance obligation sits with them — ABC must fulfil it. Failure exposes the agent.</td></tr>
+          <tr><td><strong>Tenants</strong></td><td>Could have payments blocked and PII sent to NCA. Most will never know this system exists.</td></tr>
+          <tr><td><strong>ABC Operations</strong></td><td>Manual review colleague faces material workload increase at volume.</td></tr>
+          <tr><td><strong>ABC Commercial</strong></td><td>£120k/year new cost with no current revenue offset.</td></tr>
+          <tr><td><strong>NCA</strong></td><td>New recipient of structured notifications — requirements not yet defined.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>What success looks like</h3>
+      <table>
+        <thead><tr><th>#</th><th>Success condition</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Fully compliant before 2027 legislation comes into force</td></tr>
+          <tr><td>2</td><td>No sanctioned tenant's rent payment is processed after a confirmed match</td></tr>
+          <tr><td>3</td><td>NCA notified correctly and within a defined timeframe</td></tr>
+          <tr><td>4</td><td>Letting agents have visibility of monitoring status without manual intervention</td></tr>
+          <tr><td>5</td><td>Manual review workload is bounded by an SLA</td></tr>
+          <tr><td>6</td><td>Cost of ongoing monitoring is priced into the product</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CURRENT SYSTEM MAP -->
+  <section id="system">
+    <div class="page-header">
+      <div class="breadcrumb">02 — Current System Map</div>
+      <h2>Current System Map</h2>
+      <p>How the existing sanctions check and rent payment flows work today.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Flow A — Sanctions check (contract signing)</h3>
+        <div class="flow">Tenant inputs name, DOB, nationality
+Tenant uploads ID document
+Tenant signs contract
+        ↓
+Automated check runs
+(self-reported data)
+        ↓
+Score &lt; 0.70         Score ≥ 0.70
+    ↓                     ↓
+'no match'         Human review
+✓ Continue         (5 min – 1 hr)
+                          ↓
+                No match      Match
+                'no match'    'match'
+                ✓ Continue    ✗ Block</div>
+      </div>
+      <div class="card">
+        <h3>Flow B — Rent payments (ongoing)</h3>
+        <div class="flow">All signed + checks = 'no match'
+        ↓
+Rent collection enabled
+        ↓
+Tenant pays monthly by card
+        ↓
+9am: funds in client money account
+        ↓
+  [8-hour unprotected window]
+        ↓
+5pm: ABC pays out to agents
+        ↓
+'match' status → payment blocked
+(only possible from contract signing)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Key observations</h3>
+      <table>
+        <thead><tr><th>Observation</th><th>Implication for new requirement</th></tr></thead>
+        <tbody>
+          <tr><td>One trigger, one moment — no recurring check mechanism</td><td>Entire new requirement sits outside current system design</td></tr>
+          <tr><td>Automated check uses self-reported data, not ID document</td><td>Data quality risk for ongoing monitoring — low-risk scores may be based on incorrect data</td></tr>
+          <tr><td>9am–5pm window is unprotected</td><td>Funds can move before a mid-cycle match is caught — new hold logic required</td></tr>
+          <tr><td>Human review has no SLA</td><td>A flag at 4:50pm may not resolve before 5pm payout</td></tr>
+          <tr><td>Payment blocking is binary and passive — no external notification</td><td>NCA notification is entirely new territory</td></tr>
+          <tr><td>Only 50% of tenants are on rent payments</td><td>100,000 in scope for ongoing monitoring — not 200,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- EDGE CASES -->
+  <section id="tensions">
+    <div class="page-header">
+      <div class="breadcrumb">03 — Edge Cases & Tensions</div>
+      <h2>Edge Cases & Tensions</h2>
+      <p>Where the current system has gaps, and where the new requirement creates complexity.</p>
+    </div>
+
+    <div class="card">
+      <h3>Timing tensions</h3>
+      <div class="tension">
+        <h4>The 9am–5pm window</h4>
+        <p>Funds arrive at 9am, payout at 5pm. A match confirmed at 4:58pm must still block the 5pm payout. The system needs a real-time hold trigger, not a batch check. If human review is in progress at 5pm, the default must be: hold, not release.</p>
+      </div>
+      <div class="tension">
+        <h4>12 exposure windows per year</h4>
+        <p>Monthly rent = 12 moments per year where funds are in transit. The system must be ready to intercept at any of these, not just once.</p>
+      </div>
+      <div class="tension">
+        <h4>Retrospective match after payout</h4>
+        <p>If a match is confirmed after the 5pm payout, funds are with the letting agent — not ABC. The legislation says funds stay wherever they are "at the point the match is determined." Is ABC responsible for clawback? This is a legal question the product must handle both outcomes of.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Data quality issues</h3>
+      <div class="tension">
+        <h4>Self-reported vs. ID data</h4>
+        <p>The automated check runs on tenant-typed data. A different transliteration or typo at onboarding returns a low score — never triggering human review. For ongoing monitoring: which data set do we run checks against?</p>
+      </div>
+      <div class="tension">
+        <h4>Address data not currently collected</h4>
+        <p>The NCA notification requires current address. We don't collect it today. This gap must be closed before R1 ships — either at onboarding or pulled from the tenancy agreement.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>New obligations with no current equivalent</h3>
+      <div class="tension">
+        <h4>NCA notification</h4>
+        <p>An outbound email to a government body containing PII is a new integration type. What is the required format? What is the timeframe? What happens if the email fails to send? Does ABC send directly or via the letting agent?</p>
+      </div>
+      <div class="tension">
+        <h4>False positive mid-tenancy</h4>
+        <p>A false positive at contract signing delays the tenancy starting. Mid-tenancy, it's worse: rent is frozen, tenant can't pay, agent is stuck. Resolving false positives quickly needs a defined and fast process.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ASSUMPTIONS & QUESTIONS -->
+  <section id="questions">
+    <div class="page-header">
+      <div class="breadcrumb">04 — Assumptions & Questions</div>
+      <h2>Assumptions & Open Questions</h2>
+      <p>What I'm assuming, what I'd need answered before building, and what I'd escalate.</p>
+    </div>
+
+    <div class="card">
+      <h3>Assumptions I'm making</h3>
+      <table>
+        <thead><tr><th>Assumption</th><th>Rationale</th></tr></thead>
+        <tbody>
+          <tr><td>Monitoring applies to 100k rent-payment tenants only</td><td>ABC's obligation is tied to its role in facilitating payments</td></tr>
+          <tr><td>Monthly check cadence — aligned to payment cycle</td><td>Minimum defensible; daily is 30x the cost with no legislative basis</td></tr>
+          <tr><td>0.70 threshold unchanged for ongoing monitoring</td><td>No indication in the brief that it changes</td></tr>
+          <tr><td>Unresolved review at 5pm = hold by default</td><td>Safest legal position; releasing funds during an active review creates compliance exposure</td></tr>
+          <tr><td>ABC sends NCA notification directly</td><td>ABC detects the match; obligation follows the detection</td></tr>
+          <tr><td>Current address collected at tenancy start</td><td>Collecting at point of match introduces delay and evasion risk</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Questions for legal / compliance</h3>
+        <div class="question">Is a check frequency specified in the legislation, or do we define it?</div>
+        <div class="question">Does the obligation apply only where ABC facilitates payments?</div>
+        <div class="question">Required timeframe for NCA notification after confirmed match?</div>
+        <div class="question">If funds are already paid out at point of match — where does the freeze obligation sit?</div>
+        <div class="question">GDPR/transparency: must the tenant be told a check was run?</div>
+        <div class="question">Audit log retention period?</div>
+      </div>
+      <div class="card">
+        <h3>Questions for engineering</h3>
+        <div class="question">Can the sanctions API be called on a schedule, or only event-driven?</div>
+        <div class="question">Can a payment hold be applied per-tenant in real time, or is it batch-only?</div>
+        <div class="question">Is the 5pm payout interruptible per-tenant?</div>
+        <div class="question">Do we retain ID documents post-signing, or is data discarded?</div>
+        <div class="question">What's the cost/effort of adding address to the onboarding data model?</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Questions for operations</h3>
+      <div class="question">What is the current flag rate (% of checks scoring ≥ 0.70)? This is the most important unknown — it determines everything about operational load.</div>
+      <div class="question">Does manual review cover evenings and weekends, or business hours only?</div>
+      <div class="question">Is there an escalation path if the reviewer is unavailable or uncertain?</div>
+    </div>
+  </section>
+
+  <!-- NUMBERS -->
+  <section id="numbers">
+    <div class="page-header">
+      <div class="breadcrumb">05 — Numbers & Sizing</div>
+      <h2>Numbers & Sizing</h2>
+      <p>Cost, revenue, and operational load implications of ongoing sanctions monitoring.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card highlight">
+        <div class="label">Current check revenue</div>
+        <div class="value">£400k</div>
+        <div class="sub">200k × £2.00/tenant</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Current check cost</div>
+        <div class="value">£20k</div>
+        <div class="sub">200k × £0.10/check</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="label">New monitoring cost (monthly)</div>
+        <div class="value">£120k</div>
+        <div class="sub">1.2m checks × £0.10</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="label">Cost increase</div>
+        <div class="value">6×</div>
+        <div class="sub">vs. current check cost base</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Cost of ongoing monitoring — frequency scenarios</h3>
+      <table>
+        <thead><tr><th>Frequency</th><th>Checks/year</th><th>Cost/year</th><th>vs. current</th><th>Recommendation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Monthly</strong></td><td>1,200,000</td><td>£120,000</td><td>+£100k</td><td><span class="tag green">Recommended</span></td></tr>
+          <tr><td>Weekly</td><td>5,200,000</td><td>£520,000</td><td>+£500k</td><td><span class="tag grey">No legal basis</span></td></tr>
+          <tr><td>Daily</td><td>36,500,000</td><td>£3,650,000</td><td>+£3.6m</td><td><span class="tag red">Not viable</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Revenue model — if ABC charges for monitoring</h3>
+      <table>
+        <thead><tr><th>Price per tenant/month</th><th>Annual revenue (100k tenants)</th><th>Annual cost</th><th>Net margin</th></tr></thead>
+        <tbody>
+          <tr><td>£0.15</td><td>£180,000</td><td>£120,000</td><td>£60,000</td></tr>
+          <tr><td>£0.25</td><td>£300,000</td><td>£120,000</td><td>£180,000</td></tr>
+          <tr><td><strong>£0.50</strong></td><td><strong>£600,000</strong></td><td><strong>£120,000</strong></td><td><strong>£480,000</strong></td></tr>
+          <tr><td>£1.00</td><td>£1,200,000</td><td>£120,000</td><td>£1,080,000</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px; font-size:13px; color:#666">Break-even via upfront fee increase: raise contract signing fee from £2.00 → £2.60 (+£0.60). Recurring charge is the stronger commercial model — converts one-time transaction to subscription revenue.</p>
+    </div>
+
+    <div class="card">
+      <h3>Operational load — manual review volume</h3>
+      <div class="alert orange"><strong>Critical unknown:</strong> The current flag rate is not provided in the brief. This must be established from existing data before committing to check cadence.</div>
+      <table>
+        <thead><tr><th>Flag rate</th><th>Current reviews/year</th><th>Additional reviews/month (monitoring)</th><th>Hours/month (at 30 min avg)</th></tr></thead>
+        <tbody>
+          <tr><td>0.5%</td><td>1,000</td><td>500</td><td>~250 hrs</td></tr>
+          <tr><td><strong>1%</strong></td><td><strong>2,000</strong></td><td><strong>1,000</strong></td><td><strong>~500 hrs</strong></td></tr>
+          <tr><td>2%</td><td>4,000</td><td>2,000</td><td>~1,000 hrs</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:14px; font-size:13px; color:#666">At 1% flag rate, ongoing monitoring adds up to <strong>500–1,000 hours of manual review per month</strong>. This is the single biggest operational risk in the new requirement.</p>
+    </div>
+  </section>
+
+  <!-- SOLUTION FLOW -->
+  <section id="flow">
+    <div class="page-header">
+      <div class="breadcrumb">06 — Proposed Solution Flow</div>
+      <h2>Proposed Solution Flow</h2>
+      <p>End-to-end flow across three scenarios: no match, pending review, confirmed match mid-tenancy.</p>
+    </div>
+
+    <div class="alert blue"><strong>Key design decision:</strong> The payment hold is applied at the point of automated flag (score ≥ 0.70), not after human review confirms a match. Funds cannot move while a potential match is unresolved.</div>
+
+    <div class="card">
+      <h3>Scenario 1 — No match (expected for the vast majority)</h3>
+      <div class="flow">Monthly schedule triggers
+        ↓
+Automated check runs for each active rent tenant
+        ↓
+Score &lt; 0.70 → Status: 'no match' → logged with timestamp
+        ↓
+Rent payment cycle proceeds as normal
+9am funds arrive → 5pm payout to letting agent</div>
+      <p>No human intervention. Audit log updated. Letting agent sees portfolio-level "all clear."</p>
+    </div>
+
+    <div class="card">
+      <h3>Scenario 2 — Automated flag, pending human review</h3>
+      <div class="flow">Score ≥ 0.70
+        ↓
+⚠️  PAYMENT HOLD applied immediately
+Status: 'pending review'
+Letting agent notified: "Tenant under review, payment paused"
+        ↓
+Colleague reviews using ID document on file
+SLA: resolve before next 5pm payout
+        ↓
+No match confirmed          Match confirmed
+        ↓                          ↓
+Status: 'no match'          Status: 'match'
+Hold released               → Scenario 3
+Funds paid at next payout
+Letting agent notified</div>
+    </div>
+
+    <div class="card">
+      <h3>Scenario 3 — Confirmed match mid-tenancy</h3>
+      <div class="flow">Match confirmed by human reviewer
+        ↓
+Two simultaneous actions:
+
+PAYMENT HOLD — permanent        NCA NOTIFICATION
+Funds remain in client          Automated email sent:
+money account                   - Full name (from ID)
+All future payments blocked     - Date of birth
+Letting agent notified          - Current address
+                                Delivery logged + timestamped
+        ↓
+Audit log updated: match confirmed, NCA notified, payment blocked
+Case handed to compliance/legal for further action</div>
+    </div>
+
+    <div class="card">
+      <h3>What ABC does not do</h3>
+      <div class="tag-row">
+        <span class="tag grey">Does not contact the tenant</span>
+        <span class="tag grey">Does not determine what happens to the tenancy</span>
+        <span class="tag grey">Does not clawback already-paid funds</span>
+        <span class="tag grey">Does not replace legal counsel</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RELEASE PLAN -->
+  <section id="releases">
+    <div class="page-header">
+      <div class="breadcrumb">07 — Two-Release Plan</div>
+      <h2>Two-Release Plan</h2>
+      <p>What ships in R1 (legally compliant) vs R2 (operationally excellent). The split is about priority logic, not a fixed timeline — actual dates set with engineering.</p>
+    </div>
+
+    <div class="alert orange"><strong>Before planning:</strong> I'd need to know — current SDLC and sprint cadence, engineering capacity, competing workstreams, legal sign-off availability, and QA cycle time. The sprint estimates below are indicative.</div>
+
+    <div class="release-block">
+      <h3>Release 1 — Compliance minimum</h3>
+      <div class="goal">Goal: Be legally compliant before 2027. Nothing more.</div>
+
+      <div class="epic">
+        <div><div class="epic-title">Epic 1 — Data foundations</div><div class="epic-desc">Add current address to tenant onboarding; backfill strategy for existing tenants</div></div>
+        <span class="sprint-badge">~1 sprint</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 2 — Scheduled monitoring engine</div><div class="epic-desc">Monthly batch job for 100k tenants; API volume handling; audit log</div></div>
+        <span class="sprint-badge">~2 sprints</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 3 — Payment hold logic</div><div class="epic-desc">Per-tenant hold triggered on flag; hold respected at 5pm payout; real-time status</div></div>
+        <span class="sprint-badge">~2 sprints</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 4 — Manual review queue extension</div><div class="epic-desc">Extend existing queue to surface ongoing monitoring flags; status updates payment hold</div></div>
+        <span class="sprint-badge">~1 sprint</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 5 — NCA notification</div><div class="epic-desc">Automated email on confirmed match; basic retry; delivery logged</div></div>
+        <span class="sprint-badge">~1 sprint</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 6 — Letting agent notification</div><div class="epic-desc">Email on hold applied; email on hold resolved</div></div>
+        <span class="sprint-badge">~1 sprint</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 7 — Testing, legal review, rollout</div><div class="epic-desc">End-to-end testing; legal sign-off; staged rollout to full 100k tenants</div></div>
+        <span class="sprint-badge">~2 sprints</span>
+      </div>
+      <div class="tag-row" style="margin-top:8px">
+        <span class="tag blue">~10 sprints / ~5 months indicative</span>
+      </div>
+    </div>
+
+    <div class="release-block r2">
+      <h3>Release 2 — Operational improvement</h3>
+      <div class="goal">Goal: Make the system reliable, scalable, and commercially sustainable.</div>
+
+      <div class="epic">
+        <div><div class="epic-title">Epic 8 — Letting agent dashboard</div><div class="epic-desc">Portfolio-level monitoring status: all clear / under review / match confirmed</div></div>
+        <span class="sprint-badge r2">~2 sprints</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 9 — Review triage and SLA enforcement</div><div class="epic-desc">Priority queue by confidence score; alert if unresolved within SLA window</div></div>
+        <span class="sprint-badge r2">~1 sprint</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 10 — Improved data quality</div><div class="epic-desc">Use ID-extracted data for checks; reduce false positive rate</div></div>
+        <span class="sprint-badge r2">~2 sprints</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 11 — NCA notification hardening</div><div class="epic-desc">Robust retry, failure escalation, manual send fallback</div></div>
+        <span class="sprint-badge r2">~1 sprint</span>
+      </div>
+      <div class="epic">
+        <div><div class="epic-title">Epic 12 — Pricing model update</div><div class="epic-desc">Recurring charge for ongoing monitoring; billing integration; agent comms</div></div>
+        <span class="sprint-badge r2">~1 sprint</span>
+      </div>
+      <div class="tag-row" style="margin-top:8px">
+        <span class="tag" style="background:#f0ebff;color:#5b21b6">~7 sprints / ~3.5 months indicative</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What we would not do (in either release)</h3>
+      <table>
+        <thead><tr><th>What</th><th>Why not</th></tr></thead>
+        <tbody>
+          <tr><td>Daily or weekly check cadence at launch</td><td>10–30x the cost; no legislative basis; not operationally ready</td></tr>
+          <tr><td>Automatic tenant notification of sanctions check</td><td>Could tip off a sanctioned individual; needs legal sign-off we don't have time for</td></tr>
+          <tr><td>Clawback of funds already paid to letting agents</td><td>Outside ABC's contractual remit — a legal/agent matter</td></tr>
+          <tr><td>Build our own sanctions database</td><td>No commercial case; existing API is sufficient</td></tr>
+          <tr><td>Automate the human review decision</td><td>Compliance decisions carry regulatory risk — human stays in the loop</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- WAYS OF WORKING -->
+  <section id="team">
+    <div class="page-header">
+      <div class="breadcrumb">08 — Ways of Working</div>
+      <h2>Ways of Working</h2>
+      <p>How I'd move this from problem to shipped at a 45-person company.</p>
+    </div>
+
+    <div class="alert blue"><strong>Principle:</strong> At a company this size, process should serve the work, not the other way around. Shared understanding, clear ownership, fast feedback loops, no surprises.</div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Discovery</h3>
+        <p><strong>Who:</strong> PM, one engineer, legal, manual review colleague</p>
+        <p style="margin-top:10px">Start with the manual review colleague — they know where the current process breaks and what the real operational risk is. Most undervalued input on this problem.</p>
+        <p style="margin-top:10px">Output: short problem brief (done), validated assumptions, open questions answered or escalated.</p>
+      </div>
+      <div class="card">
+        <h3>Spec and alignment</h3>
+        <p><strong>Who:</strong> PM, engineering lead, design (review queue + agent notifications), legal</p>
+        <p style="margin-top:10px">Lean spec — not 20 pages. Covers: what the system must do, decision logic, scenarios, explicit out-of-scope. Flow diagrams are the primary communication tool.</p>
+        <p style="margin-top:10px">One alignment session with engineering and legal together before build starts. Disagree early, not mid-sprint.</p>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Build and review</h3>
+        <p>Check in at start and end of each sprint — not daily. Prioritise unblocking over updating.</p>
+        <p style="margin-top:10px">Test the critical paths personally before UAT: payment hold logic, 5pm payout behaviour, NCA email trigger. These are the scenarios where a bug has legal consequences.</p>
+        <p style="margin-top:10px">Staged rollout: internal → pilot agents → full 100k. Never go straight to full scale on a compliance feature.</p>
+      </div>
+      <div class="card">
+        <h3>Stakeholder communication</h3>
+        <table style="margin-top:4px">
+          <thead><tr><th>Who</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td>Engineering lead</td><td>Ongoing — as needed</td></tr>
+            <tr><td>Legal / compliance</td><td>Spec stage + before release</td></tr>
+            <tr><td>Manual review colleague</td><td>Discovery + UAT</td></tr>
+            <tr><td>Letting agents</td><td>Before R1 ships — not after</td></tr>
+            <tr><td>Senior leadership</td><td>Kick-off + before R1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>What I would not do</h3>
+      <div class="tag-row">
+        <span class="tag grey">No formal discovery sprint with workshops</span>
+        <span class="tag grey">No 20-page PRD</span>
+        <span class="tag grey">No gating progress on perfect legal clarity</span>
+      </div>
+      <p style="margin-top:12px; font-size:13px; color:#555">The problem is well-defined and time-constrained. Lightweight alignment sessions are faster and sufficient. Build what we know, flag what's pending, don't let uncertainty become a blocker.</p>
+    </div>
+  </section>
+
+  <!-- SUCCESS METRICS -->
+  <section id="metrics">
+    <div class="page-header">
+      <div class="breadcrumb">09 — Success Metrics</div>
+      <h2>Success Metrics</h2>
+      <p>How we define success before we ship, and how we know it worked after launch.</p>
+    </div>
+
+    <div class="alert green"><strong>The test:</strong> If a regulator audited our sanctions monitoring process today, could we demonstrate that every active rent tenant was checked monthly, every match was caught, every NCA notification was sent, and every payment hold was correctly applied? If yes — R1 has done its job.</div>
+
+    <div class="card">
+      <h3>Compliance metrics — non-negotiable</h3>
+      <div class="metric-row"><span class="metric-name">% of active rent tenants receiving monthly check</span><span class="metric-target">100%</span></div>
+      <div class="metric-row"><span class="metric-name">% of confirmed matches where payment hold applied before next payout</span><span class="metric-target">100%</span></div>
+      <div class="metric-row"><span class="metric-name">% of confirmed matches where NCA was notified</span><span class="metric-target">100%</span></div>
+      <div class="metric-row"><span class="metric-name">Instances of funds released for a tenant with 'match' status</span><span class="metric-target">0 breaches</span></div>
+      <div class="metric-row"><span class="metric-name">NCA notification delivery failure rate</span><span class="metric-target">&lt;1%; zero unresolved</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Operational metrics</h3>
+      <div class="metric-row"><span class="metric-name">Manual review resolution time</span><span class="metric-target warn">95% within 4 hours</span></div>
+      <div class="metric-row"><span class="metric-name">Payment holds released same-day (false positives resolved before 5pm)</span><span class="metric-target warn">&gt;80%</span></div>
+      <div class="metric-row"><span class="metric-name">False positive rate (flagged, resolved as no match)</span><span class="metric-target warn">Baseline in R1; reduce in R2</span></div>
+      <div class="metric-row"><span class="metric-name">Agent support contacts from payment hold events</span><span class="metric-target warn">&lt;5% of hold events</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Business metrics</h3>
+      <div class="metric-row"><span class="metric-name">Cost of ongoing monitoring as % of check revenue</span><span class="metric-target warn">Tracked monthly → inform R2 pricing</span></div>
+      <div class="metric-row"><span class="metric-name">Letting agent churn attributable to monitoring friction</span><span class="metric-target">0</span></div>
+      <div class="metric-row"><span class="metric-name">Time to full R1 rollout (all 100k tenants)</span><span class="metric-target warn">Within 4 weeks of release</span></div>
+    </div>
+
+    <div class="card">
+      <h3>Post-launch review cadence</h3>
+      <table>
+        <thead><tr><th>When</th><th>What we're checking</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Week 1–2</strong></td><td>Did all 100k checks fire? Any incorrect holds? Any NCA email failures? Is review queue volume manageable?</td></tr>
+          <tr><td><strong>Month 1</strong></td><td>Establish baselines: flag rate, review resolution time, false positive rate, support contact volume</td></tr>
+          <tr><td><strong>Month 3</strong></td><td>R1 retrospective — are all compliance metrics at 100%? Is one reviewer sufficient? Does R2 scope need to accelerate?</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  function show(id, el) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (el) el.classList.add('active');
+    window.scrollTo(0, 0);
+    return false;
+  }
+</script>
+
+</body>
+</html>
