@@ -431,11 +431,11 @@
     <p>Ongoing Sanctions Monitoring</p>
   </div>
   <ul>
-    <li><a href="#" class="active" onclick="show('home', this)"><span class="num">⌂</span> Overview</a></li>
+    <li><a href="#" onclick="show('home', this)"><span class="num">⌂</span> Overview</a></li>
 
     <div class="tag">The Work</div>
 
-    <li><a href="#" onclick="show('brief', this)"><span class="num">00</span> Problem Brief</a></li>
+    <li><a href="#" class="active" onclick="show('brief', this)"><span class="num">00</span> Problem Brief</a></li>
     <li><a href="#" onclick="show('framing', this)"><span class="num">01</span> Problem Framing</a></li>
     <li><a href="#" onclick="show('system', this)"><span class="num">02</span> Current System Map</a></li>
     <li><a href="#" onclick="show('tensions', this)"><span class="num">03</span> Edge Cases & Tensions</a></li>
@@ -452,7 +452,7 @@
 <main>
 
   <!-- HOME -->
-  <section id="home" class="active">
+  <section id="home">
     <div class="page-header">
       <div class="breadcrumb">StuRents — Product Manager Interview Task</div>
       <h2>Ongoing Sanctions Monitoring</h2>
@@ -536,61 +536,151 @@
   </section>
 
   <!-- PROBLEM BRIEF -->
-  <section id="brief">
+  <section id="brief" class="active">
     <div class="page-header">
       <div class="breadcrumb">00 — Problem Brief</div>
       <h2>Problem Brief: Ongoing Sanctions Monitoring</h2>
-      <p>Draft alignment doc — not a PRD. Enough to get engineering, legal, and operations in the same room with shared understanding.</p>
+      <p>Draft alignment doc — not a PRD. Enough to get engineering, legal, and operations in the same room.</p>
     </div>
 
-    <div class="alert green"><strong>Purpose:</strong> This brief exists to align the team before design starts. No decisions need to be made from it — the goal is shared understanding.</div>
-
-    <div class="card">
-      <h3>What's happening and why we need to act</h3>
-      <p>The UK Government is introducing legislation in 2027 that extends the existing sanctions checking obligation on letting agents. Today, a sanctions check is required once — at the point a tenant signs their tenancy agreement. From 2027, that check must become continuous throughout the tenancy.</p>
-      <p>ABC Ltd currently performs the one-time check on behalf of letting agents automatically. When the new legislation comes into force, our letting agent customers will need to demonstrate ongoing monitoring is in place. If our software doesn't support it, they are non-compliant — and so are we.</p>
-      <p><strong>This is not optional and it is not a roadmap item. It is a legal deadline.</strong></p>
-    </div>
-
-    <div class="two-col">
-      <div class="card">
-        <h3>What the legislation requires</h3>
-        <p>If a tenant is matched against the UK sanctions list at any point during their tenancy:</p>
-        <div class="tag-row">
-          <span class="tag orange">Freeze rent payments immediately</span>
-          <span class="tag red">Notify NCA by email</span>
-        </div>
-        <p style="margin-top:12px">NCA notification must include: tenant full name, date of birth, current address.</p>
+    <!-- Context strip -->
+    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-bottom:28px;">
+      <div style="background:#0d1b3e; border-radius:10px; padding:20px; color:#fff;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.5); margin-bottom:8px;">Legal deadline</div>
+        <div style="font-size:32px; font-weight:700; color:#4a9eff;">2027</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:6px;">Non-negotiable. Not a roadmap item.</div>
       </div>
-      <div class="card">
-        <h3>What we need to build</h3>
-        <div class="tag-row" style="margin-bottom:12px">
-          <span class="tag blue">Scheduled monthly check</span>
-          <span class="tag blue">Real-time payment hold</span>
-          <span class="tag blue">NCA notification</span>
-          <span class="tag orange">Address data collection</span>
-        </div>
-        <p>Current address is not in our data model today. This gap must be closed before R1 ships.</p>
+      <div style="background:#fff3e0; border-radius:10px; padding:20px; border:1px solid #ffe0b2;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#bf6000; margin-bottom:8px;">Tenants in scope</div>
+        <div style="font-size:32px; font-weight:700; color:#e07b00;">100k</div>
+        <div style="font-size:12px; color:#7a4000; margin-top:6px;">Active rent payments via ABC</div>
+      </div>
+      <div style="background:#fdecea; border-radius:10px; padding:20px; border:1px solid #ffcdd2;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#b71c1c; margin-bottom:8px;">New annual check cost</div>
+        <div style="font-size:32px; font-weight:700; color:#d63b3b;">£120k</div>
+        <div style="font-size:12px; color:#7a0000; margin-top:6px;">6× current spend. No new revenue to offset it.</div>
       </div>
     </div>
 
-    <div class="card">
-      <h3>The core tension</h3>
-      <p>The legislation requires speed: freeze funds the moment a match is determined. But our current human review process takes up to an hour with no defined SLA. A flag at 4pm needs to be resolved before the 5pm payout. We need an SLA, an escalation path, or a default-hold rule before we ship.</p>
+    <!-- What's changing -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">What's changing</h3>
+      <div style="display:flex; align-items:stretch; gap:0;">
+        <div style="flex:1; background:#f4f6f9; border-radius:8px; padding:18px 20px;">
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#888; margin-bottom:10px;">Today</div>
+          <div style="font-size:22px; margin-bottom:8px;">✅</div>
+          <div style="font-weight:600; font-size:14px; color:#0d1b3e; margin-bottom:6px;">One check at the point of contract signing</div>
+          <div style="font-size:13px; color:#555; line-height:1.6;">Sanctions check runs automatically when a tenant signs their contract. Job done.</div>
+        </div>
+        <div style="display:flex; align-items:center; padding:0 16px; font-size:22px; color:#ccc;">→</div>
+        <div style="flex:1; background:#fff3e0; border-radius:8px; padding:18px 20px; border:1px solid #ffe0b2;">
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#bf6000; margin-bottom:10px;">From 2027</div>
+          <div style="font-size:22px; margin-bottom:8px;">🔁</div>
+          <div style="font-weight:600; font-size:14px; color:#7a4000; margin-bottom:6px;">Continuous monitoring</div>
+          <div style="font-size:13px; color:#7a4000; line-height:1.6;">Checks must run throughout the entire tenancy. A match at any point triggers immediate action.</div>
+        </div>
+      </div>
     </div>
 
+    <!-- If a match is found -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">If a match is found mid-tenancy, two things must happen</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div style="background:#fdecea; border-radius:8px; padding:18px; border-left:4px solid #d63b3b;">
+          <div style="font-size:24px; margin-bottom:8px;">🔒</div>
+          <div style="font-weight:700; font-size:14px; color:#b71c1c; margin-bottom:6px;">Freeze rent payments immediately</div>
+          <div style="font-size:12px; color:#7a0000; line-height:1.6;">Funds must stay wherever they are at the moment the match is determined. Not at the next payout. Immediately.</div>
+        </div>
+        <div style="background:#fdecea; border-radius:8px; padding:18px; border-left:4px solid #d63b3b;">
+          <div style="font-size:24px; margin-bottom:8px;">📧</div>
+          <div style="font-weight:700; font-size:14px; color:#b71c1c; margin-bottom:6px;">Notify the NCA by email</div>
+          <div style="font-size:12px; color:#7a0000; line-height:1.6;">Must include: full name, date of birth, current address. We don't currently collect current address.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The human bottleneck -->
+    <div class="card" style="margin-bottom:20px; border-left:4px solid #e07b00;">
+      <h3 style="margin-bottom:16px;">⚠️ The bigger problem: the human in the middle</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px;">
+        <div style="text-align:center; background:#fff8f0; border-radius:8px; padding:16px;">
+          <div style="font-size:28px; font-weight:700; color:#e07b00;">1 person</div>
+          <div style="font-size:12px; color:#7a4000; margin-top:4px;">reviewing every flagged check</div>
+        </div>
+        <div style="text-align:center; background:#fff8f0; border-radius:8px; padding:16px;">
+          <div style="font-size:28px; font-weight:700; color:#e07b00;">5–60 min</div>
+          <div style="font-size:12px; color:#7a4000; margin-top:4px;">per review, no SLA</div>
+        </div>
+        <div style="text-align:center; background:#fff8f0; border-radius:8px; padding:16px;">
+          <div style="font-size:28px; font-weight:700; color:#e07b00;">12×</div>
+          <div style="font-size:12px; color:#7a4000; margin-top:4px;">potential volume increase</div>
+        </div>
+      </div>
+      <div style="font-size:13px; color:#555; line-height:1.7; background:#f4f6f9; border-radius:8px; padding:14px;">
+        Today, a delayed review means a delayed contract signing — frustrating, but recoverable. Under ongoing monitoring, the same delay means a tenant's rent payment is frozen and a letting agent receives nothing. The stakes are fundamentally different. <strong>We need to understand this person's workflow before we consider any response to this problem.</strong>
+      </div>
+    </div>
+
+    <!-- System gaps -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">Known gaps in the current system</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#f4f6f9; border-radius:8px; padding:14px;">
+          <span style="font-size:18px; margin-top:1px;">🚫</span>
+          <div><div style="font-size:13px; font-weight:600; color:#0d1b3e;">No recurring check mechanism</div><div style="font-size:12px; color:#666; margin-top:3px;">System only knows how to check once, at signing</div></div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#f4f6f9; border-radius:8px; padding:14px;">
+          <span style="font-size:18px; margin-top:1px;">🚫</span>
+          <div><div style="font-size:13px; font-weight:600; color:#0d1b3e;">No mid-tenancy payment hold</div><div style="font-size:12px; color:#666; margin-top:3px;">Current block only triggers at point of signing, not during tenancy</div></div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#f4f6f9; border-radius:8px; padding:14px;">
+          <span style="font-size:18px; margin-top:1px;">🚫</span>
+          <div><div style="font-size:13px; font-weight:600; color:#0d1b3e;">No external notification capability</div><div style="font-size:12px; color:#666; margin-top:3px;">No integration with the NCA or any government body exists today</div></div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:12px; background:#fdecea; border-radius:8px; padding:14px; border:1px solid #ffcdd2;">
+          <span style="font-size:18px; margin-top:1px;">❌</span>
+          <div><div style="font-size:13px; font-weight:600; color:#b71c1c;">Current address not collected</div><div style="font-size:12px; color:#7a0000; margin-top:3px;">Required for NCA notification — not in our data model today</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Open questions -->
     <div class="card">
-      <h3>What we need to align on before design starts</h3>
-      <table>
-        <thead><tr><th>Question</th><th>Why it matters</th></tr></thead>
-        <tbody>
-          <tr><td>Does "ongoing monitoring" specify a frequency?</td><td>Determines check cadence and cost model</td></tr>
-          <tr><td>NCA notification format and timeframe?</td><td>Shapes the integration spec</td></tr>
-          <tr><td>Current flag rate from existing checks?</td><td>Determines operational load on the reviewer</td></tr>
-          <tr><td>Can the sanctions API support scheduled batch calls?</td><td>Core technical feasibility question</td></tr>
-          <tr><td>How do we collect address for existing tenants?</td><td>Backfill strategy needed before go-live</td></tr>
-        </tbody>
-      </table>
+      <h3 style="margin-bottom:16px;">Questions to answer before we go any further</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="border-left:3px solid #e07b00; background:#fff8f0; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#bf6000; margin-bottom:5px;">Workflow</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">What does the manual reviewer's day actually look like, step by step?</div>
+        </div>
+        <div style="border-left:3px solid #e07b00; background:#fff8f0; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#bf6000; margin-bottom:5px;">Volume</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">What is the current flag rate? This is the most important unknown we have.</div>
+        </div>
+        <div style="border-left:3px solid #e07b00; background:#fff8f0; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#bf6000; margin-bottom:5px;">Time</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">What makes a review take 5 minutes vs. 1 hour? Where does the time go?</div>
+        </div>
+        <div style="border-left:3px solid #e07b00; background:#fff8f0; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#bf6000; margin-bottom:5px;">Coverage</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">Does the reviewer work evenings and weekends? Rent doesn't pause for business hours.</div>
+        </div>
+        <div style="border-left:3px solid #e07b00; background:#fff8f0; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#bf6000; margin-bottom:5px;">Escalation</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">What happens if the reviewer is unavailable when a flag comes in?</div>
+        </div>
+        <div style="border-left:3px solid #4a9eff; background:#f0f7ff; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#1a5cbf; margin-bottom:5px;">Legal</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">Does the legislation specify a monitoring frequency, or do we define it?</div>
+        </div>
+        <div style="border-left:3px solid #4a9eff; background:#f0f7ff; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#1a5cbf; margin-bottom:5px;">NCA</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">What format and timeframe does the NCA require for notification?</div>
+        </div>
+        <div style="border-left:3px solid #aaa; background:#f4f6f9; border-radius:0 8px 8px 0; padding:12px 14px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#666; margin-bottom:5px;">Considered, parked</div>
+          <div style="font-size:13px; color:#333; line-height:1.6;">Could a pre-signing check reduce pressure at the signing moment? Likely not the primary lever — GDPR constraints and double-check cost make this complex.</div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -780,6 +870,161 @@ Tenant pays monthly by card
           <tr><td>Current address collected at tenancy start</td><td>Collecting at point of match introduces delay and evasion risk</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Assumed manual reviewer workflow -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:4px;">Assumed workflow — manual reviewer (to be validated)</h3>
+      <p style="font-size:13px; color:#666; margin-bottom:24px; line-height:1.6;">This is our current best guess at what this person's process looks like end-to-end. We need to sit with them and validate every step before drawing any conclusions or making any decisions.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+
+        <!-- Left: vertical step flow -->
+        <div style="position:relative;">
+
+          <!-- Step 1 -->
+          <div style="display:flex; gap:16px; margin-bottom:0;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:40px; height:40px; background:#0d1b3e; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">🔔</div>
+              <div style="width:2px; background:#e0e7ef; flex:1; min-height:32px; margin:4px 0;"></div>
+            </div>
+            <div style="padding-bottom:24px; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <div style="font-size:14px; font-weight:700; color:#0d1b3e;">1. Trigger received</div>
+                <span style="font-size:11px; background:#e8f2ff; color:#1a5cbf; padding:2px 8px; border-radius:10px; white-space:nowrap; margin-left:8px;">~0 min</span>
+              </div>
+              <div style="font-size:13px; color:#444; line-height:1.6; margin-bottom:8px;">The automated check returns a confidence score ≥ 0.70. Something in the system notifies the reviewer that a case needs attention.</div>
+              <div style="background:#fff3e0; border-radius:6px; padding:8px 12px; font-size:12px; color:#7a4000; border-left:3px solid #e07b00;">❓ How does the reviewer know? Email? Dashboard? A queue they have to manually check? We don't know.</div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div style="display:flex; gap:16px; margin-bottom:0;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:40px; height:40px; background:#0d1b3e; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">🔍</div>
+              <div style="width:2px; background:#e0e7ef; flex:1; min-height:32px; margin:4px 0;"></div>
+            </div>
+            <div style="padding-bottom:24px; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <div style="font-size:14px; font-weight:700; color:#0d1b3e;">2. Access the flagged case</div>
+                <span style="font-size:11px; background:#e8f2ff; color:#1a5cbf; padding:2px 8px; border-radius:10px; white-space:nowrap; margin-left:8px;">~2–5 min</span>
+              </div>
+              <div style="font-size:13px; color:#444; line-height:1.6; margin-bottom:8px;">Reviewer navigates to the flagged check in the system, finds the associated tenancy, and locates the tenant's uploaded ID document.</div>
+              <div style="background:#fff3e0; border-radius:6px; padding:8px 12px; font-size:12px; color:#7a4000; border-left:3px solid #e07b00;">❓ How many clicks to get there? Is the ID easy to find or buried? Is it always a readable file format?</div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div style="display:flex; gap:16px; margin-bottom:0;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:40px; height:40px; background:#0d1b3e; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">🪪</div>
+              <div style="width:2px; background:#e0e7ef; flex:1; min-height:32px; margin:4px 0;"></div>
+            </div>
+            <div style="padding-bottom:24px; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <div style="font-size:14px; font-weight:700; color:#0d1b3e;">3. Review the ID document</div>
+                <span style="font-size:11px; background:#fff3e0; color:#bf6000; padding:2px 8px; border-radius:10px; white-space:nowrap; margin-left:8px;">~5–20 min</span>
+              </div>
+              <div style="font-size:13px; color:#444; line-height:1.6; margin-bottom:8px;">Reviewer reads the name, date of birth, and nationality from the ID and cross-references against the flagged result. Assesses whether discrepancies between the self-reported data and the ID data explain the flag.</div>
+              <div style="background:#fff3e0; border-radius:6px; padding:8px 12px; font-size:12px; color:#7a4000; border-left:3px solid #e07b00;">❓ ID quality varies widely — passport vs. driving licence vs. foreign ID. Transliteration differences, blurry uploads, or non-Latin scripts can add significant time here.</div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div style="display:flex; gap:16px; margin-bottom:0;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:40px; height:40px; background:#0d1b3e; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">🔄</div>
+              <div style="width:2px; background:#e0e7ef; flex:1; min-height:32px; margin:4px 0;"></div>
+            </div>
+            <div style="padding-bottom:24px; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <div style="font-size:14px; font-weight:700; color:#0d1b3e;">4. Re-run the check manually</div>
+                <span style="font-size:11px; background:#e8f2ff; color:#1a5cbf; padding:2px 8px; border-radius:10px; white-space:nowrap; margin-left:8px;">~2–5 min</span>
+              </div>
+              <div style="font-size:13px; color:#444; line-height:1.6; margin-bottom:8px;">Using the data from the ID document (not the tenant's self-reported input), the reviewer re-runs the sanctions check manually. This is the definitive check — it corrects any discrepancies from the initial automated run.</div>
+              <div style="background:#fff3e0; border-radius:6px; padding:8px 12px; font-size:12px; color:#7a4000; border-left:3px solid #e07b00;">❓ Does the reviewer use the same API tool the automated check uses? A different system? Manual OFSI list lookup? We don't know.</div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div style="display:flex; gap:16px; margin-bottom:0;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:40px; height:40px; background:#0d1b3e; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">⚖️</div>
+              <div style="width:2px; background:#e0e7ef; flex:1; min-height:32px; margin:4px 0;"></div>
+            </div>
+            <div style="padding-bottom:24px; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <div style="font-size:14px; font-weight:700; color:#0d1b3e;">5. Make a decision</div>
+                <span style="font-size:11px; background:#fdecea; color:#b71c1c; padding:2px 8px; border-radius:10px; white-space:nowrap; margin-left:8px;">~5–30 min</span>
+              </div>
+              <div style="font-size:13px; color:#444; line-height:1.6; margin-bottom:8px;">The reviewer determines whether the result is a match or no match and sets the status in the system. This is the highest-stakes step — an incorrect decision has direct legal consequences either way.</div>
+              <div style="background:#fdecea; border-radius:6px; padding:8px 12px; font-size:12px; color:#7a0000; border-left:3px solid #d63b3b;">❌ No escalation path. If the reviewer is uncertain, there is currently no defined process for getting a second opinion or escalating. One person carries this alone.</div>
+            </div>
+          </div>
+
+          <!-- Step 6 -->
+          <div style="display:flex; gap:16px; margin-bottom:0;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="width:40px; height:40px; background:#0d1b3e; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">📝</div>
+            </div>
+            <div style="padding-bottom:8px; flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                <div style="font-size:14px; font-weight:700; color:#0d1b3e;">6. Document the decision</div>
+                <span style="font-size:11px; background:#e8f2ff; color:#1a5cbf; padding:2px 8px; border-radius:10px; white-space:nowrap; margin-left:8px;">~2–5 min</span>
+              </div>
+              <div style="font-size:13px; color:#444; line-height:1.6; margin-bottom:8px;">The reviewer logs their decision and reasoning for the audit trail. Compliance decisions must be traceable — especially for any OFSI enquiry.</div>
+              <div style="background:#fff3e0; border-radius:6px; padding:8px 12px; font-size:12px; color:#7a4000; border-left:3px solid #e07b00;">❓ Where does this get logged? In the system? A spreadsheet? An email? How formal is the trail? We don't know.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: context panel -->
+        <div style="display:flex; flex-direction:column; gap:16px;">
+
+          <!-- Time breakdown -->
+          <div style="background:#f4f6f9; border-radius:10px; padding:20px;">
+            <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#888; margin-bottom:14px;">Estimated time per review</div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div style="background:#e6f7ee; border-radius:8px; padding:14px 16px; border-left:4px solid #1a7a45;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#1a7a45; margin-bottom:4px;">Best case</div>
+                <div style="font-size:26px; font-weight:700; color:#1a7a45;">~15 min</div>
+                <div style="font-size:12px; color:#2d6a4f; margin-top:3px;">Clear ID, name mismatch obviously explains the flag, straightforward no match</div>
+              </div>
+              <div style="background:#fff3e0; border-radius:8px; padding:14px 16px; border-left:4px solid #e07b00;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#bf6000; margin-bottom:4px;">Typical case</div>
+                <div style="font-size:26px; font-weight:700; color:#e07b00;">~30 min</div>
+                <div style="font-size:12px; color:#7a4000; margin-top:3px;">Common name, multiple possible matches on the sanctions list, requires careful comparison</div>
+              </div>
+              <div style="background:#fdecea; border-radius:8px; padding:14px 16px; border-left:4px solid #d63b3b;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#b71c1c; margin-bottom:4px;">Worst case</div>
+                <div style="font-size:26px; font-weight:700; color:#d63b3b;">~60 min</div>
+                <div style="font-size:12px; color:#7a0000; margin-top:3px;">Poor quality ID, foreign script, high-risk profile, genuinely uncertain decision with no one to ask</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What we don't know -->
+          <div style="background:#f4f6f9; border-radius:10px; padding:20px;">
+            <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#888; margin-bottom:14px;">What we still don't know</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="font-size:13px; color:#333; padding:10px 12px; background:#fff; border-radius:6px; border-left:3px solid #e07b00; line-height:1.5;">How does the reviewer know a case is waiting for them?</div>
+              <div style="font-size:13px; color:#333; padding:10px 12px; background:#fff; border-radius:6px; border-left:3px solid #e07b00; line-height:1.5;">Does this person work evenings or weekends?</div>
+              <div style="font-size:13px; color:#333; padding:10px 12px; background:#fff; border-radius:6px; border-left:3px solid #e07b00; line-height:1.5;">What happens when they're on leave or unavailable?</div>
+              <div style="font-size:13px; color:#333; padding:10px 12px; background:#fff; border-radius:6px; border-left:3px solid #e07b00; line-height:1.5;">What tools do they actually use to re-run the check?</div>
+              <div style="font-size:13px; color:#333; padding:10px 12px; background:#fff; border-radius:6px; border-left:3px solid #e07b00; line-height:1.5;">Where and how is the decision documented?</div>
+              <div style="font-size:13px; color:#333; padding:10px 12px; background:#fff; border-radius:6px; border-left:3px solid #d63b3b; line-height:1.5;">What is the current flag rate? This single number determines everything about whether this process can scale.</div>
+            </div>
+          </div>
+
+          <!-- Assumption callout -->
+          <div style="background:#fff8f0; border:1px solid #ffe0b2; border-radius:10px; padding:16px;">
+            <div style="font-size:12px; font-weight:700; color:#bf6000; margin-bottom:6px;">⚠️ These are assumptions</div>
+            <div style="font-size:12px; color:#7a4000; line-height:1.6;">We have not spoken to this person. The single most valuable thing we can do before any design work is spend 30–60 minutes shadowing this process in real life. Everything above could be wrong.</div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
     <div class="two-col">
