@@ -1166,70 +1166,198 @@ Tenant pays monthly by card
   <!-- SOLUTION FLOW -->
   <section id="flow">
     <div class="page-header">
-      <div class="breadcrumb">06 — Proposed Solution Flow</div>
-      <h2>Proposed Solution Flow</h2>
-      <p>End-to-end flow across three scenarios: no match, pending review, confirmed match mid-tenancy.</p>
+      <div class="breadcrumb">Artifact 07 — Solution Workflow</div>
+      <h2>Proposed Solution Workflow</h2>
+      <p>A multi-agent pipeline that resolves the majority of flags automatically, with Priya only seeing what no agent could resolve. Every stage has an audit log.</p>
     </div>
 
-    <div class="alert blue"><strong>Key design decision:</strong> The payment hold is applied at the point of automated flag (score ≥ 0.70), not after human review confirms a match. Funds cannot move while a potential match is unresolved.</div>
+    <div class="alert blue" style="margin-bottom:24px;"><strong>Key design change from v1:</strong> The payment hold no longer fires when Agent 1 flags. Agents 2 and 3 run first, silently. The hold only fires if a case reaches Priya. This eliminates unnecessary holds and letting agent notifications for cases that agents can resolve in seconds.</div>
 
-    <div class="card">
-      <h3>Scenario 1 — No match (expected for the vast majority)</h3>
-      <div class="flow">Monthly schedule triggers
-        ↓
-Automated check runs for each active rent tenant
-        ↓
-Score &lt; 0.70 → Status: 'no match' → logged with timestamp
-        ↓
-Rent payment cycle proceeds as normal
-9am funds arrive → 5pm payout to letting agent</div>
-      <p>No human intervention. Audit log updated. Letting agent sees portfolio-level "all clear."</p>
-    </div>
-
-    <div class="card">
-      <h3>Scenario 2 — Automated flag, pending human review</h3>
-      <div class="flow">Score ≥ 0.70
-        ↓
-⚠️  PAYMENT HOLD applied immediately
-Status: 'pending review'
-Letting agent notified: "Tenant under review, payment paused"
-        ↓
-Colleague reviews using ID document on file
-SLA: resolve before next 5pm payout
-        ↓
-No match confirmed          Match confirmed
-        ↓                          ↓
-Status: 'no match'          Status: 'match'
-Hold released               → Scenario 3
-Funds paid at next payout
-Letting agent notified</div>
-    </div>
-
-    <div class="card">
-      <h3>Scenario 3 — Confirmed match mid-tenancy</h3>
-      <div class="flow">Match confirmed by human reviewer
-        ↓
-Two simultaneous actions:
-
-PAYMENT HOLD — permanent        NCA NOTIFICATION
-Funds remain in client          Automated email sent:
-money account                   - Full name (from ID)
-All future payments blocked     - Date of birth
-Letting agent notified          - Current address
-                                Delivery logged + timestamped
-        ↓
-Audit log updated: match confirmed, NCA notified, payment blocked
-Case handed to compliance/legal for further action</div>
-    </div>
-
-    <div class="card">
-      <h3>What ABC does not do</h3>
-      <div class="tag-row">
-        <span class="tag grey">Does not contact the tenant</span>
-        <span class="tag grey">Does not determine what happens to the tenancy</span>
-        <span class="tag grey">Does not clawback already-paid funds</span>
-        <span class="tag grey">Does not replace legal counsel</span>
+    <!-- Agent map -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">The agent pipeline — who does what</h3>
+      <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:10px;">
+        <div style="background:#f4f6f9; border-radius:8px; padding:14px; text-align:center; border-top:3px solid #4a9eff;">
+          <div style="font-size:18px; margin-bottom:6px;">🧹</div>
+          <div style="font-size:11px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Agent 0</div>
+          <div style="font-size:11px; color:#555; line-height:1.4;">Data Quality</div>
+          <div style="font-size:10px; color:#888; margin-top:6px;">Validates data before pipeline starts</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:14px; text-align:center; border-top:3px solid #4a9eff;">
+          <div style="font-size:18px; margin-bottom:6px;">🔍</div>
+          <div style="font-size:11px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Agent 1</div>
+          <div style="font-size:11px; color:#555; line-height:1.4;">Sanctions Check</div>
+          <div style="font-size:10px; color:#888; margin-top:6px;">Existing. Self-reported data.</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:14px; text-align:center; border-top:3px solid #7c4dff;">
+          <div style="font-size:18px; margin-bottom:6px;">🔤</div>
+          <div style="font-size:11px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Agent 2</div>
+          <div style="font-size:11px; color:#555; line-height:1.4;">Name Specialist</div>
+          <div style="font-size:10px; color:#888; margin-top:6px;">Transliterations, aliases, variants</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:14px; text-align:center; border-top:3px solid #7c4dff;">
+          <div style="font-size:18px; margin-bottom:6px;">🪪</div>
+          <div style="font-size:11px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Agent 3</div>
+          <div style="font-size:11px; color:#555; line-height:1.4;">Photo ID Matcher</div>
+          <div style="font-size:10px; color:#888; margin-top:6px;">Extracts & cross-references ID data</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:14px; text-align:center; border-top:3px solid #e07b00;">
+          <div style="font-size:18px; margin-bottom:6px;">⚡</div>
+          <div style="font-size:11px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Triage Agent</div>
+          <div style="font-size:11px; color:#555; line-height:1.4;">Priority Setter</div>
+          <div style="font-size:10px; color:#888; margin-top:6px;">Score + time-to-5pm urgency</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:14px; text-align:center; border-top:3px solid #d63b3b;">
+          <div style="font-size:18px; margin-bottom:6px;">👁️</div>
+          <div style="font-size:11px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Oversight Agent</div>
+          <div style="font-size:11px; color:#555; line-height:1.4;">Watches the watchers</div>
+          <div style="font-size:10px; color:#888; margin-top:6px;">Flags anomalies across all agents</div>
+        </div>
       </div>
+      <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+        <div style="background:#f4f6f9; border-radius:8px; padding:10px 14px; font-size:12px; color:#333; flex:1; min-width:200px;"><strong>📣 Notification Agent</strong> — manages all outbound comms (letting agent, NCA) with retry logic and delivery confirmation</div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:10px 14px; font-size:12px; color:#333; flex:1; min-width:200px;"><strong>🔁 Feedback Agent</strong> — feeds every resolved outcome back into Agent 1 to improve confidence scoring over time</div>
+      </div>
+    </div>
+
+    <!-- Full flow -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">The full flow</h3>
+      <div class="flow" style="font-size:12px; line-height:2;">EVERY MONTH — Scheduled job fires for all 100k active rent tenants
+│
+▼
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AGENT 0 — Data Quality Check
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Is tenant data complete? Current address on file? ID present and readable?
+│                    [AUDIT LOG: data completeness, gaps flagged, timestamp]
+│
+├── Data incomplete → Flag to PM/Ops for resolution before check runs
+│
+└── Data complete
+        │
+        ▼
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AGENT 1 — Existing automated sanctions check
+(self-reported name, DOB, nationality)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        │                    [AUDIT LOG: score, data used, timestamp]
+        │
+        ├── Score &lt; 0.70 → ✅ 'no match' logged → Rent proceeds
+        │
+        └── Score ≥ 0.70 — CONFIDENCE BANDING APPLIED
+                │
+                ├── Score 0.70–0.89 (uncertain) ──────────┐
+                │                                          │
+                └── Score ≥ 0.90 (high confidence) ──→ Skip to Triage Agent
+                                                           │
+                    ┌──────────────────────────────────────┘
+                    │
+                    ▼
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        AGENTS 2 + 3 — Run in parallel (silent, no hold yet)
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        Agent 2: name variants, transliterations, aliases
+        Agent 3: extracts ID data, cross-references sanctions entry
+        │                    [AUDIT LOG: variants tried, ID data extracted, outcome]
+        │
+        ├── Either agent resolves as NO MATCH
+        │       │
+        │       └── ✅ 'no match' logged → Feedback Agent updates Agent 1
+        │               Rent proceeds. No hold. No agent notification.
+        │
+        └── Neither agent can resolve
+                │
+                ▼
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        TRIAGE AGENT — Sets priority before Priya sees it
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        Factors: confidence score, time to 5pm payout, rent amount at risk
+        Assigns: URGENT / HIGH / STANDARD priority
+        │                    [AUDIT LOG: priority assigned, factors used]
+        │
+        ▼
+⚠️  NOW: Payment hold applied
+⚠️  Notification Agent: letting agent informed ("payment under review")
+        │
+        ▼
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        PRIYA — Human review (pre-enriched case pack)
+        Case arrives with: Agent 2 variants tried, Agent 3 ID data,
+        sanctions entry shown side-by-side, SLA countdown to 5pm
+        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        │                    [AUDIT LOG: reviewer, time taken, decision, reasoning]
+        │
+        ├── Uncertain → ESCALATE (legal / second reviewer)
+        │
+        ├── NO MATCH confirmed
+        │       │
+        │       └── AUTO: Hold released
+        │           Notification Agent: agent informed ("payment released")
+        │           Feedback Agent: outcome fed back to Agent 1
+        │           ✅ Rent proceeds at next payout
+        │
+        └── MATCH confirmed
+                │
+                ▼
+        AUTO: Hold made permanent
+        AUTO: All future payments blocked
+        Notification Agent: NCA email DRAFTED — Priya reviews + approves
+        (name, DOB, current address)
+        │                    [AUDIT LOG: NCA draft, Priya approval, send timestamp, delivery confirmed]
+        │
+        AUTO: Letting agent notified ("payment permanently frozen")
+        AUTO: Case escalated to legal
+        Feedback Agent: outcome fed back to Agent 1
+        → 🔴 Legal takes over
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OVERSIGHT AGENT — runs continuously across all of the above
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Monitors: Agent 2/3 clear rates, Priya decision patterns, anomalies
+Weekly summary → compliance team</div>
+    </div>
+
+    <!-- Key design decisions -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+      <div class="card">
+        <h3 style="margin-bottom:12px;">Key design decisions</h3>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="background:#e6f7ee; border-radius:6px; padding:10px 12px; font-size:12px; color:#1a4a2e; border-left:3px solid #1a7a45;"><strong>Hold fires late, not early.</strong> Agents 2+3 run silently first. Letting agents only hear about a problem if agents can't resolve it.</div>
+          <div style="background:#e6f7ee; border-radius:6px; padding:10px 12px; font-size:12px; color:#1a4a2e; border-left:3px solid #1a7a45;"><strong>Agents 2+3 run in parallel.</strong> Faster resolution, first confident answer wins.</div>
+          <div style="background:#e6f7ee; border-radius:6px; padding:10px 12px; font-size:12px; color:#1a4a2e; border-left:3px solid #1a7a45;"><strong>Confidence banding.</strong> High-confidence flags (≥0.90) skip straight to Triage Agent with urgent SLA.</div>
+          <div style="background:#e6f7ee; border-radius:6px; padding:10px 12px; font-size:12px; color:#1a4a2e; border-left:3px solid #1a7a45;"><strong>NCA email requires Priya's approval.</strong> Auto-drafted, human-confirmed. Not fully automated.</div>
+          <div style="background:#e6f7ee; border-radius:6px; padding:10px 12px; font-size:12px; color:#1a4a2e; border-left:3px solid #1a7a45;"><strong>Every outcome feeds Agent 1.</strong> The system improves with every case resolved.</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px;">What ABC does not do</h3>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="background:#f4f6f9; border-radius:6px; padding:10px 12px; font-size:12px; color:#555;">Does not contact the tenant directly</div>
+          <div style="background:#f4f6f9; border-radius:6px; padding:10px 12px; font-size:12px; color:#555;">Does not determine what happens to the tenancy</div>
+          <div style="background:#f4f6f9; border-radius:6px; padding:10px 12px; font-size:12px; color:#555;">Does not clawback funds already paid to letting agents</div>
+          <div style="background:#f4f6f9; border-radius:6px; padding:10px 12px; font-size:12px; color:#555;">Does not send the NCA notification without human confirmation</div>
+          <div style="background:#f4f6f9; border-radius:6px; padding:10px 12px; font-size:12px; color:#555;">Does not make a sanctions match decision autonomously</div>
+          <div style="background:#f4f6f9; border-radius:6px; padding:10px 12px; font-size:12px; color:#555;">Does not replace legal counsel once a match is confirmed</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit log summary -->
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Audit trail — what gets logged and where</h3>
+      <table>
+        <thead><tr><th>Stage</th><th>What's logged</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Agent 0</strong></td><td>Data completeness check, gaps found, timestamp</td><td>Proves checks ran on valid data — OFSI defence</td></tr>
+          <tr><td><strong>Agent 1</strong></td><td>Score, input data used, timestamp</td><td>Baseline record for every tenant every month</td></tr>
+          <tr><td><strong>Agents 2+3</strong></td><td>Variants tried, ID data extracted, outcome, which agent resolved</td><td>Shows due diligence on every flagged case</td></tr>
+          <tr><td><strong>Triage Agent</strong></td><td>Priority assigned, factors used, time to 5pm at point of triage</td><td>Proves urgency was correctly assessed</td></tr>
+          <tr><td><strong>Priya</strong></td><td>Reviewer name, time taken, decision, reasoning notes</td><td>Human accountability — critical for any dispute</td></tr>
+          <tr><td><strong>NCA notification</strong></td><td>Draft content, Priya approval timestamp, send timestamp, delivery confirmed</td><td>Legal obligation — must be provable</td></tr>
+          <tr><td><strong>Oversight Agent</strong></td><td>Agent clear rates, anomalies flagged, weekly summary</td><td>Catches systemic errors before they compound</td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
@@ -1327,58 +1455,196 @@ Case handed to compliance/legal for further action</div>
   <!-- WAYS OF WORKING -->
   <section id="team">
     <div class="page-header">
-      <div class="breadcrumb">08 — Ways of Working</div>
+      <div class="breadcrumb">Artifact 03 — Ways of Working</div>
       <h2>Ways of Working</h2>
-      <p>How I'd move this from problem to shipped at a 45-person company.</p>
+      <p>Agreed at the very start — before discovery, before spec, before build. This is the team contract that everything else runs on.</p>
     </div>
 
-    <div class="alert blue"><strong>Principle:</strong> At a company this size, process should serve the work, not the other way around. Shared understanding, clear ownership, fast feedback loops, no surprises.</div>
-
-    <div class="two-col">
-      <div class="card">
-        <h3>Discovery</h3>
-        <p><strong>Who:</strong> PM, one engineer, legal, manual review colleague</p>
-        <p style="margin-top:10px">Start with the manual review colleague — they know where the current process breaks and what the real operational risk is. Most undervalued input on this problem.</p>
-        <p style="margin-top:10px">Output: short problem brief (done), validated assumptions, open questions answered or escalated.</p>
-      </div>
-      <div class="card">
-        <h3>Spec and alignment</h3>
-        <p><strong>Who:</strong> PM, engineering lead, design (review queue + agent notifications), legal</p>
-        <p style="margin-top:10px">Lean spec — not 20 pages. Covers: what the system must do, decision logic, scenarios, explicit out-of-scope. Flow diagrams are the primary communication tool.</p>
-        <p style="margin-top:10px">One alignment session with engineering and legal together before build starts. Disagree early, not mid-sprint.</p>
-      </div>
+    <!-- Principle banner -->
+    <div style="background:#0d1b3e; border-radius:10px; padding:24px 28px; margin-bottom:24px; color:#fff;">
+      <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:rgba(255,255,255,0.4); margin-bottom:10px;">The guiding principle</div>
+      <p style="font-size:15px; line-height:1.7; color:rgba(255,255,255,0.85); max-width:720px;">At 45 people, process should serve the work — not the other way around. We take the best of Lean and Scrum, drop what doesn't fit our context, and agree it together up front. No surprises, no process for process's sake.</p>
     </div>
 
-    <div class="two-col">
-      <div class="card">
-        <h3>Build and review</h3>
-        <p>Check in at start and end of each sprint — not daily. Prioritise unblocking over updating.</p>
-        <p style="margin-top:10px">Test the critical paths personally before UAT: payment hold logic, 5pm payout behaviour, NCA email trigger. These are the scenarios where a bug has legal consequences.</p>
-        <p style="margin-top:10px">Staged rollout: internal → pilot agents → full 100k. Never go straight to full scale on a compliance feature.</p>
+    <!-- The core team -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">The core team</h3>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px;">
+        <div style="background:#f4f6f9; border-radius:8px; padding:16px; border-top:4px solid #4a9eff;">
+          <div style="font-size:22px; margin-bottom:8px;">🧭</div>
+          <div style="font-size:13px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Product Manager</div>
+          <div style="font-size:12px; color:#555; line-height:1.5;">Owns the problem, the artifacts, and the communication. Facilitates — doesn't dictate.</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:16px; border-top:4px solid #7c4dff;">
+          <div style="font-size:22px; margin-bottom:8px;">⚙️</div>
+          <div style="font-size:13px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Engineer</div>
+          <div style="font-size:12px; color:#555; line-height:1.5;">Owns technical discovery and estimation. In the room from day one — not handed a spec cold.</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:16px; border-top:4px solid #e07b00;">
+          <div style="font-size:22px; margin-bottom:8px;">🎨</div>
+          <div style="font-size:13px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Designer</div>
+          <div style="font-size:12px; color:#555; line-height:1.5;">Owns the reviewer queue UX and agent notifications. Prototypes before the spec is final.</div>
+        </div>
+        <div style="background:#f4f6f9; border-radius:8px; padding:16px; border-top:4px solid #d63b3b;">
+          <div style="font-size:22px; margin-bottom:8px;">⚖️</div>
+          <div style="font-size:13px; font-weight:700; color:#0d1b3e; margin-bottom:4px;">Legal / Compliance</div>
+          <div style="font-size:12px; color:#555; line-height:1.5;">Consulted, not embedded. Required sign-off at spec stage and before R1 ships.</div>
+        </div>
       </div>
-      <div class="card">
-        <h3>Stakeholder communication</h3>
-        <table style="margin-top:4px">
-          <thead><tr><th>Who</th><th>When</th></tr></thead>
-          <tbody>
-            <tr><td>Engineering lead</td><td>Ongoing — as needed</td></tr>
-            <tr><td>Legal / compliance</td><td>Spec stage + before release</td></tr>
-            <tr><td>Manual review colleague</td><td>Discovery + UAT</td></tr>
-            <tr><td>Letting agents</td><td>Before R1 ships — not after</td></tr>
-            <tr><td>Senior leadership</td><td>Kick-off + before R1</td></tr>
-          </tbody>
-        </table>
+      <div style="margin-top:14px; background:#fff3e0; border-radius:8px; padding:12px 16px; font-size:12px; color:#7a4000; border-left:3px solid #e07b00;">
+        <strong>Also involved:</strong> Priya (manual review colleague) — the most important voice in discovery. Senior leadership — kick-off and pre-release only. Letting agents — communicated to before R1 ships, not after.
       </div>
     </div>
 
+    <!-- Methodology -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:6px;">Methodology — what we take, what we leave</h3>
+      <p style="font-size:13px; color:#666; margin-bottom:16px;">We're not picking a framework off the shelf. We're taking what's useful from Lean and Scrum for a 45-person company with a hard legal deadline.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;">
+        <div style="border-radius:8px; border:1px solid #e8ecf0; padding:16px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#1a7a45; margin-bottom:10px;">✓ We take from Scrum</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#e6f7ee; border-radius:6px;">Sprints — but variable length, not fixed 2-week</div>
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#e6f7ee; border-radius:6px;">Sprint review at end of each cycle</div>
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#e6f7ee; border-radius:6px;">Clear definition of done per story</div>
+          </div>
+        </div>
+        <div style="border-radius:8px; border:1px solid #e8ecf0; padding:16px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#1a5cbf; margin-bottom:10px;">✓ We take from Lean</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#e8f2ff; border-radius:6px;">Eliminate waste — no artifact unless it earns its place</div>
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#e8f2ff; border-radius:6px;">Continuous improvement — retrospective every release</div>
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#e8f2ff; border-radius:6px;">Question everything: are we doing this because it adds value?</div>
+          </div>
+        </div>
+        <div style="border-radius:8px; border:1px solid #e8ecf0; padding:16px;">
+          <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#d63b3b; margin-bottom:10px;">✗ We leave behind</div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#fdecea; border-radius:6px;">Daily standups — we're too small, check in as needed</div>
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#fdecea; border-radius:6px;">20-page PRDs — a lean spec + flow diagram is enough</div>
+            <div style="font-size:12px; color:#333; padding:6px 10px; background:#fdecea; border-radius:6px;">Fixed sprint length — R1 and R2 will likely be very different sizes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase by phase -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">How we move through the work — phase by phase</h3>
+
+      <div style="display:flex; gap:16px; margin-bottom:0;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div style="width:36px; height:36px; background:#4a9eff; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:700; flex-shrink:0;">1</div>
+          <div style="width:2px; background:#e0e7ef; flex:1; min-height:24px; margin:4px 0;"></div>
+        </div>
+        <div style="padding-bottom:20px; flex:1;">
+          <div style="font-size:14px; font-weight:700; color:#0d1b3e; margin-bottom:6px;">Kick-off — whole team, one session</div>
+          <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">PM, Engineer, Designer, Legal, Senior stakeholder. Walk through the problem brief together. Agree on the artifact journey and this ways of working doc. Surface blockers early — not mid-sprint. One session, not a series of workshops.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag blue">Output: signed-off problem brief</span>
+            <span class="tag blue">Output: agreed ways of working</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:16px; margin-bottom:0;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div style="width:36px; height:36px; background:#7c4dff; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:700; flex-shrink:0;">2</div>
+          <div style="width:2px; background:#e0e7ef; flex:1; min-height:24px; margin:4px 0;"></div>
+        </div>
+        <div style="padding-bottom:20px; flex:1;">
+          <div style="font-size:14px; font-weight:700; color:#0d1b3e; margin-bottom:6px;">Discovery — small group, fast</div>
+          <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">PM + Engineer investigate the sanctions API. PM shadows Priya (manual reviewer) for 30–60 minutes — this is the single most important discovery activity. Designer starts exploring the reviewer queue UX in parallel. Time-boxed: no open-ended discovery.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag" style="background:#f0ebff;color:#5b21b6;">Output: technical discovery doc</span>
+            <span class="tag" style="background:#f0ebff;color:#5b21b6;">Output: validated workflow assumptions</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:16px; margin-bottom:0;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div style="width:36px; height:36px; background:#7c4dff; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:700; flex-shrink:0;">3</div>
+          <div style="width:2px; background:#e0e7ef; flex:1; min-height:24px; margin:4px 0;"></div>
+        </div>
+        <div style="padding-bottom:20px; flex:1;">
+          <div style="font-size:14px; font-weight:700; color:#0d1b3e; margin-bottom:6px;">Spec + design — parallel, then converge</div>
+          <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">PM writes the draft spec. Designer produces Figma prototypes for the reviewer queue and agent notification UX. These run in parallel — then one alignment session together with Engineering before build starts. Disagree here, not in a sprint.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag" style="background:#f0ebff;color:#5b21b6;">Output: draft spec</span>
+            <span class="tag" style="background:#f0ebff;color:#5b21b6;">Output: Figma prototypes</span>
+            <span class="tag orange">Legal sign-off required</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:16px; margin-bottom:0;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div style="width:36px; height:36px; background:#e07b00; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:700; flex-shrink:0;">4</div>
+          <div style="width:2px; background:#e0e7ef; flex:1; min-height:24px; margin:4px 0;"></div>
+        </div>
+        <div style="padding-bottom:20px; flex:1;">
+          <div style="font-size:14px; font-weight:700; color:#0d1b3e; margin-bottom:6px;">Build — sprints, check-ins at boundaries</div>
+          <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">Engineer builds against the spec. PM checks in at the start and end of each sprint — not daily. Priority is unblocking, not updating. PM personally tests critical compliance paths before UAT: payment hold logic, 5pm payout behaviour, NCA email trigger.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag orange">QA shared — PM owns compliance paths, Eng owns technical paths</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:16px;">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div style="width:36px; height:36px; background:#1a7a45; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:700; flex-shrink:0;">5</div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:14px; font-weight:700; color:#0d1b3e; margin-bottom:6px;">Release — staged, never big bang</div>
+          <div style="font-size:13px; color:#555; line-height:1.6; margin-bottom:8px;">Internal → pilot letting agents → full 100k rollout. Never go straight to full scale on a compliance feature. Letting agents are communicated to before R1 ships. Priya is trained before go-live.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <span class="tag green">Output: shipped R1</span>
+            <span class="tag green">Output: comms & training delivered</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Communication cadence -->
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-bottom:16px;">Who gets told what — and when</h3>
+      <table>
+        <thead><tr><th>Who</th><th>Format</th><th>Cadence</th><th>Owned by</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Engineer + Designer</strong></td><td>Direct conversation</td><td>As needed — daily during build</td><td>PM</td></tr>
+          <tr><td><strong>Legal / Compliance</strong></td><td>Async review + one live session</td><td>Spec stage + pre-release</td><td>PM</td></tr>
+          <tr><td><strong>Priya (manual reviewer)</strong></td><td>1:1 shadow session + UAT</td><td>Discovery + before go-live</td><td>PM</td></tr>
+          <tr><td><strong>Senior leadership</strong></td><td>Brief written update</td><td>Kick-off + pre-release</td><td>PM</td></tr>
+          <tr><td><strong>Letting agents</strong></td><td>Email comms</td><td>Before R1 ships</td><td>PM + commercial</td></tr>
+          <tr><td><strong>Sanctions API provider</strong></td><td>Technical call</td><td>During discovery</td><td>Engineer + PM</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- What we won't do -->
     <div class="card">
-      <h3>What I would not do</h3>
-      <div class="tag-row">
-        <span class="tag grey">No formal discovery sprint with workshops</span>
-        <span class="tag grey">No 20-page PRD</span>
-        <span class="tag grey">No gating progress on perfect legal clarity</span>
+      <h3 style="margin-bottom:12px;">What we explicitly won't do</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div style="display:flex; align-items:flex-start; gap:10px; background:#fdecea; border-radius:8px; padding:12px 14px;">
+          <span style="color:#d63b3b; font-size:16px; margin-top:1px;">✗</span>
+          <div><div style="font-size:13px; font-weight:600; color:#7a0000;">Hand a spec to engineering cold</div><div style="font-size:12px; color:#555; margin-top:3px;">Engineer is in the room from day one — no surprises</div></div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:10px; background:#fdecea; border-radius:8px; padding:12px 14px;">
+          <span style="color:#d63b3b; font-size:16px; margin-top:1px;">✗</span>
+          <div><div style="font-size:13px; font-weight:600; color:#7a0000;">Wait for perfect legal clarity before building</div><div style="font-size:12px; color:#555; margin-top:3px;">Build what's known, flag what's pending, iterate</div></div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:10px; background:#fdecea; border-radius:8px; padding:12px 14px;">
+          <span style="color:#d63b3b; font-size:16px; margin-top:1px;">✗</span>
+          <div><div style="font-size:13px; font-weight:600; color:#7a0000;">Release to 100k tenants without a staged rollout</div><div style="font-size:12px; color:#555; margin-top:3px;">Compliance features need a safe rollback path</div></div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:10px; background:#fdecea; border-radius:8px; padding:12px 14px;">
+          <span style="color:#d63b3b; font-size:16px; margin-top:1px;">✗</span>
+          <div><div style="font-size:13px; font-weight:600; color:#7a0000;">Tell letting agents after it's live</div><div style="font-size:12px; color:#555; margin-top:3px;">They need to know before it affects their tenants</div></div>
+        </div>
       </div>
-      <p style="margin-top:12px; font-size:13px; color:#555">The problem is well-defined and time-constrained. Lightweight alignment sessions are faster and sufficient. Build what we know, flag what's pending, don't let uncertainty become a blocker.</p>
     </div>
   </section>
 
